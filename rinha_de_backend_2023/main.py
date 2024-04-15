@@ -42,9 +42,14 @@ def getPerson(id: UUID, session: Session = Depends(getSession)):
 
 # GET /pessoas?t=[:termo da busca] – para fazer uma busca por pessoas.
 @app.get("/pessoas")
-def searchOnPersons():
+def searchOnPersons(t: str, session: Session = Depends(getSession)):
     # Select p.id from Pessoas p where p.nickname like '%termo%' or p.name like '%termo%' or p.stack like '%termo%'
-    pass
+    db_matches = session.scalars(
+        sa.select(Person)
+            .where(Person.nickname.like(f'%{t}%') | Person.name.like(f'%{t}%'))
+    ).all()
+
+    return db_matches
 
 
 # GET /contagem-pessoas – endpoint especial para contagem de pessoas cadastradas.
