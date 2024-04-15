@@ -12,11 +12,13 @@ uvicorn = {extras = ["standard"], version = "^0.29.0"}
 sqlalchemy = "^2.0.29"
 alembic = "^1.13.1"
 psycopg2-binary = "^2.9.9"
+pydantic-settings = "^2.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
 black = "^24.4.0"
+taskipy = "^1.12.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -28,3 +30,11 @@ extend-exclude = "/(?!rinha_de_backend_2023|tests)[^/]+/"
 [tool.isort]
 profile = "black"
 skip = [".venv", "migrations"]
+
+[tool.taskipy.tasks]
+lint = "black --check --diff . && isort --check --diff ."
+format = "black . && isort ."
+run = "uvicorn rinha_de_backend_2023.main:app --reload"
+pre_test = "task lint"
+test = "pytest -s -x --cov=stock_backend -vv"
+post_test = "coverage html"

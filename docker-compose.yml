@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: "app"
+      POSTGRES_DB: rinha-de-backend
+      PGDATA: /data
+    volumes:
+      - "db_data:/data"
+    networks:
+      - rinha-net
+    deploy:
+      limits:
+        memory: 1G
+        cpus: 0.5
+
+  lb:
+    image: nginx:1.25.4-alpine-slim
+    networks:
+      - rinha-net
+    deploy:
+      limits:
+        memory: 1G
+        cpus: 0.5
+    
+  app:
+    depends_on:
+      - db
+    build: ./
+    secrets:
+      - db_passwd
+    networks:
+      - rinha-net
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          memory: 1G
+          cpus: 0.5
+
+volumes:
+  db_data:
+
+networks:
+  rinha-net:
+
+secrets:
+  db_passwd:
+    file: ./db_passwd
+    
