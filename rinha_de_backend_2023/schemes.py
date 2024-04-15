@@ -9,7 +9,7 @@ class NewPersonScheme(BaseModel):
     nickname: str
     name: str
     birthDate: datetime
-    stack: Optional[list[str]] = Field(None, nullable=True)
+    stack: Optional[list[str]] = Field([], nullable=True)
 
 
 class PersonScheme(NewPersonScheme):
