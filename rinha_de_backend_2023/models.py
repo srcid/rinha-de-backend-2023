@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from pydantic.dataclasses import dataclass
-from sqlalchemy import ARRAY, String
+from sqlalchemy import ARRAY, Computed, String, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
 
 
@@ -22,3 +22,7 @@ class Person(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     birthDate: Mapped[datetime] = mapped_column(nullable=False)
     stack: Mapped[list[str]] = mapped_column(ARRAY(String(32)))
+    search: Mapped[str] = mapped_column(String, 
+        Computed(text("nickname || ' ' || name || ' ' || coalesce(stack)"), 
+        persisted=True)
+    )
