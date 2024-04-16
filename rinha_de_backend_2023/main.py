@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from rinha_de_backend_2023.connection import getSession
 from rinha_de_backend_2023.models import Person
-from rinha_de_backend_2023.schemes import NewPersonScheme
+from rinha_de_backend_2023.schemes import NewPersonScheme, PersonScheme
 
 app = FastAPI()
 
@@ -27,7 +27,7 @@ def createPerson(newPerson: NewPersonScheme, session: Session = Depends(getSessi
     session.commit()
     session.refresh(db_person)
 
-    return db_person
+    return PersonScheme.model_validate(db_person)
 
 
 # GET /pessoas/[:id] – para consultar um recurso criado com a requisição anterior.
@@ -38,7 +38,7 @@ def getPerson(id: UUID, session: Session = Depends(getSession)):
     if not db_user:
         raise HTTPException(status_code=status.NOT_FOUND, detail="Person not found")
 
-    return db_user
+    return PersonScheme.model_validate(db_user)
 
 
 # GET /pessoas?t=[:termo da busca] – para fazer uma busca por pessoas.
@@ -48,11 +48,10 @@ def searchOnPersons(t: str, session: Session = Depends(getSession)):
         sa.select(Person).where(Person.search.contains(t))
     ).all()
 
-    return db_matches
+    return [ PersonScheme.model_validate(match) for match in db_matches ]
 
 
 # GET /contagem-pessoas – endpoint especial para contagem de pessoas cadastradas.
 @app.get("/contagem-pessoas")
 def countPersons(session: Session = Depends(getSession)):
-    res = session.scalar(sa.select(sa.func.count(1)).select_from(Person))
-    return res
+    return session.scalar(sa.select(sa.func.count(1)).select_from(Person))
