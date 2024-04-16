@@ -44,13 +44,8 @@ def getPerson(id: UUID, session: Session = Depends(getSession)):
 # GET /pessoas?t=[:termo da busca] – para fazer uma busca por pessoas.
 @app.get("/pessoas")
 def searchOnPersons(t: str, session: Session = Depends(getSession)):
-    # Select p.id from Pessoas p where p.nickname like '%termo%' or p.name like '%termo%' or p.stack like '%termo%'
     db_matches = session.scalars(
-        sa.select(Person)
-            .where(Person.nickname.like(f'%{t}%')
-                    | Person.name.like(f'%{t}%')
-                    | sa.func.array_to_string(Person.stack, ' ').like(f'%{t}%')
-            )
+        sa.select(Person).where(Person.search.contains(t))
     ).all()
 
     return db_matches

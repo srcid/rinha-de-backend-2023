@@ -17,12 +17,14 @@ class Base(
 class Person(Base):
     __tablename__ = "person"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
     nickname: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     birthDate: Mapped[datetime] = mapped_column(nullable=False)
     stack: Mapped[list[str]] = mapped_column(ARRAY(String(32)))
     search: Mapped[str] = mapped_column(String, 
         Computed(text("nickname || ' ' || name || ' ' || coalesce(stack)"), 
-        persisted=True)
+        persisted=True),
+        index=True,
+        nullable=False
     )
