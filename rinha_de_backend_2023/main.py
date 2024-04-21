@@ -52,13 +52,15 @@ def getPerson(id: UUID, session: Session = Depends(getSession)) -> PersonScheme:
 
 
 # GET /pessoas?t=[:termo da busca] – para fazer uma busca por pessoas.
-@app.get("/pessoas")
-def searchOnPersons(t: str, session: Session = Depends(getSession)):
+@app.get("/pessoas", status_code=status.OK)
+def searchOnPersons(
+    t: str, session: Session = Depends(getSession)
+) -> list[PersonScheme]:
     db_matches = session.scalars(
         sa.select(Person).where(Person.search.contains(t))
     ).all()
 
-    return [ PersonScheme.model_validate(match) for match in db_matches ]
+    return db_matches
 
 
 # GET /contagem-pessoas – endpoint especial para contagem de pessoas cadastradas.
