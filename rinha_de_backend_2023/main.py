@@ -64,6 +64,6 @@ def searchOnPersons(
 
 
 # GET /contagem-pessoas – endpoint especial para contagem de pessoas cadastradas.
-@app.get("/contagem-pessoas")
-def countPersons(session: Session = Depends(getSession)):
+@app.get("/contagem-pessoas", status_code=status.OK)
+def countPersons(session: Session = Depends(getSession)) -> int:
     return session.scalar(sa.select(sa.func.count(1)).select_from(Person))
