@@ -9,10 +9,10 @@ class NewPersonScheme(BaseModel):
     nickname: str
     name: str
     birthDate: datetime
-    stack: Optional[list[str]] = Field([], nullable=True)
-    
-    model_config = ConfigDict(from_attributes=True)
+    stack: Optional[list[str]]
 
 
 class PersonScheme(NewPersonScheme):
     id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
