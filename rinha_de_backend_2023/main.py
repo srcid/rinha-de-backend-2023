@@ -41,14 +41,14 @@ def createPerson(
 
 
 # GET /pessoas/[:id] – para consultar um recurso criado com a requisição anterior.
-@app.get("/pessoas/{id}")
-def getPerson(id: UUID, session: Session = Depends(getSession)):
+@app.get("/pessoas/{id}", status_code=status.OK)
+def getPerson(id: UUID, session: Session = Depends(getSession)) -> PersonScheme:
     db_user = session.scalar(sa.select(Person).where(Person.id == id))
 
     if not db_user:
         raise HTTPException(status_code=status.NOT_FOUND, detail="Person not found")
 
-    return PersonScheme.model_validate(db_user)
+    return db_user
 
 
 # GET /pessoas?t=[:termo da busca] – para fazer uma busca por pessoas.
