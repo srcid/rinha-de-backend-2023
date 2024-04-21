@@ -19,13 +19,14 @@ class Person(Base):
     __tablename__ = "person"
 
     id: Mapped[UUID] = mapped_column(primary_key=True)
-    nickname: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
-    birthDate: Mapped[datetime] = mapped_column("birth_date", nullable=False)
+    nickname: Mapped[str] = mapped_column(String(32), unique=True)
+    name: Mapped[str] = mapped_column(String(100))
+    birthDate: Mapped[datetime] = mapped_column("birth_date")
     stack: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String(32)))
-    search: Mapped[str] = mapped_column(String, 
-        Computed(text("nickname || ' ' || name || ' ' || coalesce(stack)"), 
-        persisted=True),
-        nullable=False,
-        default=None
+    search: Mapped[str] = mapped_column(
+        String,
+        Computed(
+            text("nickname || ' ' || name || ' ' || coalesce(stack)"), persisted=True
+        ),
+        default=None,
     )
