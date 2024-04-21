@@ -19,6 +19,7 @@ pydantic-settings = "^2.2.1"
 isort = "^5.13.2"
 black = "^24.4.0"
 taskipy = "^1.12.2"
+ipython = "^8.23.0"
 
 [build-system]
 requires = ["poetry-core"]
