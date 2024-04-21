@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 
 import sqlalchemy as sa
 from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from rinha_de_backend_2023.connection import getSession
@@ -13,21 +14,30 @@ app = FastAPI()
 
 
 # POST /pessoas – para criar um recurso pessoa.
-@app.post("/pessoas")
-def createPerson(newPerson: NewPersonScheme, session: Session = Depends(getSession)):
+@app.post("/pessoas", status_code=status.CREATED)
+def createPerson(
+    newPerson: NewPersonScheme, session: Session = Depends(getSession)
+) -> PersonScheme:
     db_person = Person(
         id=uuid4(),
         nickname=newPerson.nickname,
         name=newPerson.name,
         birthDate=newPerson.birthDate,
-        stack=newPerson.stack
+        stack=newPerson.stack,
     )
 
     session.add(db_person)
-    session.commit()
-    session.refresh(db_person)
 
-    return PersonScheme.model_validate(db_person)
+    try:
+        session.commit()
+        session.refresh(db_person)
+
+        return db_person
+
+    except IntegrityError as err:
+        raise HTTPException(
+            status_code=status.UNPROCESSABLE_ENTITY, detail="Nickname already exists."
+        )
 
 
 # GET /pessoas/[:id] – para consultar um recurso criado com a requisição anterior.
