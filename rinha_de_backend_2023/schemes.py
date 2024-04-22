@@ -2,14 +2,14 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, constr, field_validator
 
 
 class NewPersonScheme(BaseModel):
-    nickname: str = Field(alias="apelido")
-    name: str = Field(alias="nome")
+    nickname: str = Field(alias="apelido", max_length=32, pattern=r"^\w+$")
+    name: str = Field(alias="nome", max_length=100, pattern=r"^[^\d\W]+( [^\d\W]+)*$")
     birthDate: datetime = Field(alias="nascimento")
-    stack: Optional[list[str]]
+    stack: Optional[list[constr(max_length=32)]]
 
 
 class PersonScheme(NewPersonScheme):
