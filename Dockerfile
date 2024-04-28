@@ -1,7 +1,9 @@
 FROM python:3.12-bookworm
 
+COPY ./ /app
 WORKDIR /app
-COPY rinha_de_backend /app
-RUN apt-install python3-pip -y && pip install poetry && poetry install
+RUN pip install -r requirements.txt
 
-ENTRYPOINT [ "poetry" "shell" "uvicorn" "main:app" ]
+CMD [ "uvicorn", "rinha_de_backend_2023.main:app", "--host", "0.0.0.0", "--port", "80", "--log-level", "warning" ]
+
+EXPOSE 80
