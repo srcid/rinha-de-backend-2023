@@ -2,15 +2,33 @@ from http import HTTPStatus as status
 from uuid import UUID, uuid4
 
 import sqlalchemy as sa
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
 from rinha_de_backend_2023.connection import getSession
 from rinha_de_backend_2023.models import Person
 from rinha_de_backend_2023.schemes import NewPersonScheme, PersonScheme
 
 app = FastAPI()
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(req: Request, exc: RequestValidationError):
+    err = exc.errors()[0]
+
+    if err["msg"] in ("Input should be a valid string", "Field required"):
+        return JSONResponse(
+            content={"details": [exc.errors()]},
+            status_code=status.BAD_REQUEST,
+        )
+
+    return JSONResponse(
+        content={"details": [exc.errors()]},
+        status_code=status.UNPROCESSABLE_ENTITY,
+    )
 
 
 # POST /pessoas – para criar um recurso pessoa.
