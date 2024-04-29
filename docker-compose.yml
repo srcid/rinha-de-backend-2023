@@ -25,8 +25,7 @@ services:
     networks:
       - rinha-net
     depends_on:
-      - app1
-      - app2
+      - app
     ports:
       - 9999:9999
     volumes:
@@ -37,7 +36,7 @@ services:
           memory: 500M
           cpus: "0.25"
 
-  app1: &app1
+  app:
     depends_on:
       - db
     build: ./
@@ -47,13 +46,12 @@ services:
       DB_URI: postgresql+psycopg2://app:app@db:5432/rinha-de-backend
       FASTAPI_PRODUCTION: true
     deploy:
+      mode: replicated
+      replicas: 2
       resources:
         limits:
-          memory: 750M
-          cpus: "0.375"
-
-  app2:
-    <<: *app1
+          memory: 1G
+          cpus: "0.5"
 
 volumes:
   db_data:
