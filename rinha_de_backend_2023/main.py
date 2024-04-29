@@ -35,7 +35,7 @@ def createPerson(
         session.refresh(db_person)
 
         response.headers.append(
-            "Location", f"https://localhost:9999/pessoas/{db_person.id}"
+            "Location", f"http://localhost:9999/pessoas/{db_person.id}"
         )
 
         return db_person
